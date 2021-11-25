@@ -1,0 +1,75 @@
+Dark Nhan Tam
+60000
+260
+20.5
+14.5
+Ao thun mac trong
+100000
+120
+80
+50
+Ao khoac da
+100000
+600
+100
+90
+Ao mua nilong
+100000
+80
+80
+50
+Tat trong nha
+100000
+80
+80
+50
+So ghi chep a5
+100000
+240
+80
+50
+So ve phac hoa a4
+100000
+350
+80
+500
+Day nit Guchi
+1.5e+07
+800
+80
+50
+Dong ho Rolex
+3e+09
+550
+10
+20
+Quan di boi
+80000
+100
+50
+70
+Quan jean
+400000
+420
+140
+80
+Dep lao
+100000
+240
+30
+15
+Ao khoac di bien
+300000
+180
+80
+50
+Vot bat hai san
+300000
+360
+80
+50
+May anh
+1e+06
+420
+80
+50
