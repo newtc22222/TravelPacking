@@ -9,12 +9,14 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <windows.h>
+#include <conio.h>
 #define MAX_ITEM 1000
 
 using namespace std;
 
 string path = "item.txt";
-int so_luong_item_hientai;
+int so_luong_item_hientai; //Bien quyet dinh so luong
 
 struct item {
     string name; // ten goi
@@ -39,9 +41,14 @@ struct item {
     }
 };
 
+void ClearScreen() {
+    //cout << "\033[2J\033[1;1H"; // magic
+    system("cls");
+}
+
 int length_of_array_item(item it[]) {
-    //return sizeof it;
-    return 0;
+    unsigned int x = sizeof(it) / sizeof(it[0]);
+    return x;
 }
 
 void du_lieu_mau(item it[]) // Hàm dùng để thêm dữ liệu cho việc test
@@ -104,19 +111,98 @@ void LuuThongTinMoi(item it[]) // Luu thong tin da co thay doi vao file
     MyFile.close();
 }
 
-void themItem() // Them du lieu hoan toan moi
+void themItem(item it[]) // Them du lieu hoan toan moi
 {
-
+    int n = so_luong_item_hientai;
+    cout << "Nhap them san pham: " << endl;
+    rewind(stdin);
+    cout << "Nhap ten san pham can them :";
+    getline(cin, it[n].name);
+    cout << "Nhap gia thanh: ";
+    cin >> it[n].price;
+    cout << "Nhap can nang: ";
+    cin >> it[n].weight;
+    cout << "Nhap chieu cao: ";
+    cin >> it[n].height;
+    cout << "Nhap chieu rong: ";
+    cin >> it[n].width;
+    so_luong_item_hientai++;
 }
 
-void suaItem() // Tim kiem vat dung theo ten, sau do thuc hien chinh sua
+void NhapThongTinMoi(string& newname, float& newprice, float& newweight, float& newheight, float& newwidth)
 {
-
+    rewind(stdin);
+    cout << "\nNhap ten vat dung moi: ";
+    getline(cin, newname);
+    cout << "\nNhap gia thanh moi: ";
+    cin >> newprice;
+    cout << "\nNhap can nang moi: ";
+    cin >> newweight;
+    cout << "\nNhap chieu cao moi: ";
+    cin >> newheight;
+    cout << "\nNhap chieu rong moi: ";
+    cin >> newwidth;
 }
 
-void xoaItem() // Tim kiem vat dung, sau do xoa vat dung
+void suaItem(item it[]) // Tim kiem vat dung theo ten, sau do thuc hien chinh sua
 {
+    string x, newname;
+    float newprice, newweight, newheight, newwidth;
+    int tmp = 0;
+    int n = so_luong_item_hientai;
+    rewind(stdin);
+    cout << " Nhap ten san pham muon sua: ";
+    getline(cin, x);
+    int found = 0;
+    for (int i = 0; i < n; i++)
+    {
+        if (it[i].name == x)
+        {
+            cout << "Sua lai san pham thu " << i;
+            NhapThongTinMoi(newname, newprice, newweight, newheight, newwidth); //goi ham nhap 1 san pham de nhap lai san pham
+            it[i].name = newname;
+            it[i].price = newprice;
+            it[i].weight = newweight;
+            it[i].height = newheight;
+            it[i].width = newwidth;
+            found = 1;
+        }
+    }
+}
 
+void xoa(item it[], int n, int tmp)
+{
+    for (int i = tmp; i < n; i++)
+    {
+        it[i] = it[i + 1];
+    }
+}
+
+void xoaItem(item it[]) // Tim kiem vat dung, sau do xoa vat dung
+{
+    string x;
+    int n = so_luong_item_hientai;
+    cout << "Nhap ten san pham can xoa";
+    rewind(stdin);
+    getline(cin, x);
+    int found = 0;
+    for (int i = 0; i < n; i++)
+    {
+        if (it[i].name == x)
+        {
+            found = 1;
+            xoa(it, n, i);
+        }
+    }
+    if (found == 0)
+    {
+        cout << "\n san pham ko toi tai." << x;
+    }
+    else
+    {
+        cout << "\n Da xoa SV co ten = " << x;
+        so_luong_item_hientai--;
+    }
 }
 
 void InThongTin(item it) {
@@ -133,9 +219,138 @@ void LietKeItem(item it[], int size) {
     }
 }
 
-void TimKiemItem() // Tim kiem theo ten (hoac lua chon tim kiem theo gia/can nang/chieu dai/chieu rong)
+void TimKiemTen(item it[], int n, string x)
 {
+    for (int i = 0; i < n; i++)
+    {
+        //if (it[i].name == x)
+        //{
+        //    InThongTin(it[i]);
+        //}
+        if (it[i].name.find(x) != string::npos) // Ten co chua chuoi x
+        {
+            InThongTin(it[i]);
+        }
+    }
+}
 
+void TimKiemGia(item it[], int n, float x)
+{
+    for (int i = 0; i < n; i++)
+    {
+        if (it[i].price == x)
+        {
+            InThongTin(it[i]);
+        }
+    }
+}
+
+void TimKiemCanNang(item it[], int n, float x)
+{
+    for (int i = 0; i < n; i++)
+    {
+        if (it[i].weight == x)
+        {
+            InThongTin(it[i]);
+        }
+    }
+}
+
+void TimKiemChieuDai(item it[], int n, float x)
+{
+    for (int i = 0; i < n; i++)
+    {
+        if (it[i].height == x)
+        {
+            InThongTin(it[i]);
+        }
+    }
+}
+
+void TimKiemChieuRong(item it[], int n, float x)
+{
+    for (int i = 0; i < n; i++)
+    {
+        if (it[i].width == x)
+        {
+            InThongTin(it[i]);
+        }
+    }
+}
+
+void TimKiemItem(item it[]) // Tim kiem theo ten (hoac lua chon tim kiem theo gia/can nang/chieu dai/chieu rong)
+{
+    int choose;
+    int n = so_luong_item_hientai;
+    string x;
+    float t;
+    bool tmp = true;
+    while (tmp)
+    {
+        cout << " 1. Tim kiem theo ten. \n";
+        cout << " 2. Tim kiem theo gia. \n";
+        cout << " 3. Tim kiem theo can nang. \n";
+        cout << " 4. Tim kiem theo chieu dai. \n";
+        cout << " 5. Tim kiem heo chieu rong. \n";
+        cout << " 0. Thoat chuong trinh. \n";
+        cout << " Moi nhap lua chon \n";
+        cin >> choose;
+        switch (choose)
+        {
+        case 1:
+        {
+            ClearScreen();
+            cout << "\nNhap ten san pham ban can tim: ";
+            rewind(stdin);
+            getline(cin, x);
+            TimKiemTen(it, n, x);
+            break;
+        }
+        case 2:
+        {
+            ClearScreen();
+            cout << "\nNhap gia can tim kiem: ";
+            cin >> t;
+            TimKiemGia(it, n, t);
+            break;
+        }
+        case 3:
+        {
+            ClearScreen();
+            cout << "\nNhap can nang can tim kiem: ";
+            cin >> t;
+            TimKiemCanNang(it, n, t);
+            break;
+        }
+        case 4:
+        {
+            ClearScreen();
+            cout << "\nNhap chieu dai can tim kiem: ";
+            cin >> t;
+            TimKiemChieuDai(it, n, t);
+            break;
+        }
+        case 5:
+        {
+            ClearScreen();
+            cout << "\nNhap chieu rong can tim kiem: ";
+            cin >> t;
+            TimKiemChieuRong(it, n, t);
+            break;
+        }
+        case 0:
+        {
+            ClearScreen();
+            tmp = false;
+            break;
+        }
+        default:
+        {
+            cout << "\nKhong co chuc nang nay!" << endl;
+            break;
+        }
+        }
+    }
 }
 
 void SapXepItem() // Sap xep tuy y (theo lua chon cua nguoi dung)
@@ -179,10 +394,6 @@ void intro() {
     cout << "------------------------------------------------------" << endl;
 }
 
-void ClearScreen() {
-    cout << "\033[2J\033[1;1H"; // magic
-}
-
 int main()
 {
     // Thuoc tinh duoc cai dat
@@ -190,7 +401,7 @@ int main()
     int luaChon;
     bool flag = true; // Chay chuong trinh
 
-    item it[MAX_ITEM];
+    item *it = new item[MAX_ITEM];
     //du_lieu_mau(it);
     sample_item(it);
 
@@ -206,19 +417,19 @@ int main()
             break;
         case 2:
             ClearScreen();
-            themItem();
+            themItem(it);
             break;
         case 3:
             ClearScreen();
-            suaItem();
+            suaItem(it);
             break;
         case 4:
             ClearScreen();
-            xoaItem();
+            xoaItem(it);
             break;
         case 5:
             ClearScreen();
-            TimKiemItem();
+            TimKiemItem(it);
             break;
         case 6:
             ClearScreen();
@@ -231,8 +442,9 @@ int main()
         }
     }
 
-    //LuuThongTinMoi(it);
-
+    LuuThongTinMoi(it);
+    delete[] it;
+    it = nullptr;
     return 0;
 }
 
