@@ -14,11 +14,15 @@
 #define MAX_ITEM 1000
 #define SWAP(type,x,y) do{type tmp = x; x = y; y = tmp;} while(0)
 
-
 using namespace std;
 
 string path = "item.txt";
 int so_luong_item_hientai; //Bien quyet dinh so luong
+static int n = 500;  //So luong ca the trong quan the
+int** nghiem = new int* [n];//Mang luu cac ca the
+float* thichNghi = new float[n];//Mang luu do thich nghi cua tung ca the
+
+float canNang; // Dung luong cua balo
 
 struct item {
     string name; // ten goi
@@ -43,6 +47,8 @@ struct item {
     }
 };
 
+item* it = new item[MAX_ITEM]; //Mang luu tru items
+
 void ClearScreen() {
     //cout << "\033[2J\033[1;1H"; // magic
     system("cls");
@@ -52,6 +58,8 @@ int length_of_array_item(item it[]) {
     unsigned int x = sizeof(*it) / sizeof(it[0]);
     return x;
 }
+
+#pragma region Luu_tru_du_lieu
 
 void du_lieu_mau(item it[]) // Hàm dùng để thêm dữ liệu cho việc test
 {
@@ -79,7 +87,7 @@ void sample_item(item it[]) // Lay du lieu mau tu file item.txt dua vao struct
     string Text;
     string item_value[5];
     ifstream MyReadFile(path);
-    
+
     while (getline(MyReadFile, Text)) {
         item_value[index++] = Text;
 
@@ -113,6 +121,18 @@ void LuuThongTinMoi(item it[]) // Luu thong tin da co thay doi vao file
     MyFile.close();
 }
 
+#pragma endregion
+
+#pragma region Tuong_tac_du_lieu
+void InThongTin(item it) {
+    cout << "-----------------------------------------" << endl;
+    cout << "|Ten vat dung: " << it.name << endl;
+    cout << "|   - Gia thanh: " << it.price << endl;
+    cout << "|   - Can nang: " << it.weight << endl;
+    cout << "|   - Chieu dai: " << it.height << endl;
+    cout << "|   - Chieu rong: " << it.width << endl;
+}
+
 void themItem(item it[]) // Them du lieu hoan toan moi
 {
     int n = so_luong_item_hientai;
@@ -134,7 +154,7 @@ void themItem(item it[]) // Them du lieu hoan toan moi
 void NhapThongTinMoi(string& newname, float& newprice, float& newweight, float& newheight, float& newwidth)
 {
     rewind(stdin);
-    cout << "\nNhap ten vat dung moi: ";
+    cout << "Nhap ten vat dung moi: ";
     getline(cin, newname);
     cout << "\nNhap gia thanh moi: ";
     cin >> newprice;
@@ -160,7 +180,9 @@ void suaItem(item it[]) // Tim kiem vat dung theo ten, sau do thuc hien chinh su
     {
         if (it[i].name == x)
         {
-            cout << "Sua lai san pham thu " << i;
+            cout << "Thong tin san pham: ";
+            InThongTin(it[i]);
+            cout << "Nhap thong tin chinh sua: " << endl;
             NhapThongTinMoi(newname, newprice, newweight, newheight, newwidth); //goi ham nhap 1 san pham de nhap lai san pham
             it[i].name = newname;
             it[i].price = newprice;
@@ -169,6 +191,9 @@ void suaItem(item it[]) // Tim kiem vat dung theo ten, sau do thuc hien chinh su
             it[i].width = newwidth;
             found = 1;
         }
+    }
+    if (found == 0) {
+        cout << "Khong tim thay san pham trong danh sach!" << endl;
     }
 }
 
@@ -184,7 +209,7 @@ void xoaItem(item it[]) // Tim kiem vat dung, sau do xoa vat dung
 {
     string x;
     int n = so_luong_item_hientai;
-    cout << "Nhap ten san pham can xoa";
+    cout << "Nhap ten san pham can xoa: ";
     rewind(stdin);
     getline(cin, x);
     int found = 0;
@@ -198,21 +223,13 @@ void xoaItem(item it[]) // Tim kiem vat dung, sau do xoa vat dung
     }
     if (found == 0)
     {
-        cout << "\n san pham ko toi tai." << x;
+        cout << "\n san pham ko toi tai!" << x;
     }
     else
     {
         cout << "\n Da xoa SV co ten = " << x;
         so_luong_item_hientai--;
     }
-}
-
-void InThongTin(item it) {
-    cout << "Ten vat dung: " << it.name << endl;
-    cout << "Gia thanh: " << it.price << endl;
-    cout << "Can nang: " << it.weight << endl;
-    cout << "Chieu dai: " << it.height << endl;
-    cout << "Chieu rong: " << it.width << endl;
 }
 
 void LietKeItem(item it[], int size) {
@@ -301,20 +318,22 @@ void TimKiemItem(item it[]) // Tim kiem theo ten (hoac lua chon tim kiem theo gi
     bool tmp = true;
     while (tmp)
     {
-        cout << " 1. Tim kiem theo ten. \n";
-        cout << " 2. Tim kiem theo gia. \n";
-        cout << " 3. Tim kiem theo can nang. \n";
-        cout << " 4. Tim kiem theo chieu dai. \n";
-        cout << " 5. Tim kiem heo chieu rong. \n";
-        cout << " 0. Thoat chuong trinh. \n";
-        cout << " Moi nhap lua chon \n";
+        cout << "=====================================\n";
+        cout << "| 1. Tim kiem theo Ten              |\n";
+        cout << "| 2. Tim kiem theo Gia              |\n";
+        cout << "| 3. Tim kiem theo Can Nang         |\n";
+        cout << "| 4. Tim kiem theo Chieu Dai        |\n";
+        cout << "| 5. Tim kiem heo Chieu Rong        |\n";
+        cout << "| 0. Tro ve menu chinh              |\n";
+        cout << "=====================================\n";
+        cout << " Moi nhap lua chon: ";
         cin >> choose;
         switch (choose)
         {
         case 1:
         {
             ClearScreen();
-            cout << "\nNhap ten san pham ban can tim: ";
+            cout << "Nhap ten san pham ban can tim: ";
             rewind(stdin);
             getline(cin, x);
             if (!TimKiemTen(it, n, x))
@@ -325,7 +344,7 @@ void TimKiemItem(item it[]) // Tim kiem theo ten (hoac lua chon tim kiem theo gi
         case 2:
         {
             ClearScreen();
-            cout << "\nNhap gia can tim kiem: ";
+            cout << "Nhap gia can tim kiem: ";
             cin >> t;
             if (!TimKiemGia(it, n, t))
                 cout << "\nKhong co san pham co gia nay!\n";
@@ -335,7 +354,7 @@ void TimKiemItem(item it[]) // Tim kiem theo ten (hoac lua chon tim kiem theo gi
         case 3:
         {
             ClearScreen();
-            cout << "\nNhap can nang can tim kiem: ";
+            cout << "Nhap can nang can tim kiem: ";
             cin >> t;
             if (!TimKiemCanNang(it, n, t))
                 cout << "\nKhong co san pham co can nang nay!\n";
@@ -345,7 +364,7 @@ void TimKiemItem(item it[]) // Tim kiem theo ten (hoac lua chon tim kiem theo gi
         case 4:
         {
             ClearScreen();
-            cout << "\nNhap chieu dai can tim kiem: ";
+            cout << "Nhap chieu dai can tim kiem: ";
             cin >> t;
             if (!TimKiemChieuDai(it, n, t))
                 cout << "\nKhong co san pham co chieu dai nay!\n";
@@ -354,7 +373,7 @@ void TimKiemItem(item it[]) // Tim kiem theo ten (hoac lua chon tim kiem theo gi
         case 5:
         {
             ClearScreen();
-            cout << "\nNhap chieu rong can tim kiem: ";
+            cout << "Nhap chieu rong can tim kiem: ";
             cin >> t;
             if (!TimKiemChieuRong(it, n, t))
                 cout << "\nKhong co san pham co chieu rong nay!\n";
@@ -375,6 +394,9 @@ void TimKiemItem(item it[]) // Tim kiem theo ten (hoac lua chon tim kiem theo gi
         }
     }
 }
+#pragma endregion
+
+#pragma region Sap_xep
 
 void sapXepGia(item it[])
 {
@@ -385,6 +407,7 @@ void sapXepGia(item it[])
         }
     }
 }
+
 void sapXepCanNang(item it[])
 {
     for (int i = 0; i < so_luong_item_hientai - 1; i++) {
@@ -395,6 +418,7 @@ void sapXepCanNang(item it[])
         }
     }
 }
+
 void sapXepTen(item it[])
 {
     for (int i = 0; i < so_luong_item_hientai - 1; i++) {
@@ -408,15 +432,15 @@ void sapXepTen(item it[])
 void SapXepItem(item it[]) // Sap xep tuy y (theo lua chon cua nguoi dung)
 {
     int choose;
-    string x;
-    float t;
     bool flag = true;
     while (flag)
     {
-        cout << " 1. Sap xep theo ten. \n";
-        cout << " 2. Sap xep theo gia. \n";
-        cout << " 3. Sap xep theo can nang. \n";
-        cout << " 0. Thoat chuong trinh. \n";
+        cout << "=====================================\n";
+        cout << "| 1. Sap xep theo Ten               |\n";
+        cout << "| 2. Sap xep theo Gia               |\n";
+        cout << "| 3. Sap xep theo Can Nang          |\n";
+        cout << "| 0. Tro ve menu chinh              |\n";
+        cout << "=====================================\n";
         cout << " Moi nhap lua chon: ";
         cin >> choose;
         switch (choose)
@@ -457,25 +481,158 @@ void SapXepItem(item it[]) // Sap xep tuy y (theo lua chon cua nguoi dung)
     }
 }
 
-// Giai thuat di truyen
-void LaiGhep() {
+#pragma endregion
 
+#pragma region Giai_thuat_di_truyen
+
+void copy(float a[], float b[], int n) //Copy mang
+{
+    for (int i = 0; i < n; i++)
+        b[i] = a[i];
 }
 
-void DotBien() {
-
+void sort(float a[], int n) //Sap xep do thich nghi giam dan
+{
+    for (int i = 0; i < n - 1; i++)
+        for (int j = 1; j < n; j++)
+        {
+            if (a[j] > a[i])
+            {
+                float t = a[i];
+                a[i] = a[j];
+                a[j] = t;
+            }
+        }
 }
 
-void ChonLoc() {
-
+void CaThe(int a[]) //Tao ca the
+{
+    for (int i = 0; i < so_luong_item_hientai; i++)
+        a[i] = rand() % 2;
 }
 
-void GeneticFunction() {
-
+void KhoiTao() //Khoi tao quan the
+{
+    for (int i = 0; i < n; i++)
+    {
+        nghiem[i] = new int[so_luong_item_hientai];
+        CaThe(nghiem[i]);
+    }
 }
 
-// Input cua nguoi dung
-void NhapKhongGian(float& canNang) {
+void DanhGia(int nghiemDeCu[], float& best) //Danh gia do thich nghi va tim ca the toi uu
+{
+    for (int i = 0; i < n; i++)
+    {
+        thichNghi[i] = 0;
+        float wei = 0;
+        float val = 0;
+        for (int j = 0; j < so_luong_item_hientai; j++)
+        {
+            wei += it[j].weight * nghiem[i][j];
+            val += it[j].price * nghiem[i][j];
+        }
+        if (wei > canNang)
+            thichNghi[i] = 0;
+        else
+            thichNghi[i] = val;
+    }
+    float* temp = new float[n];
+    copy(thichNghi, temp, n);
+    sort(temp, n);
+    if (temp[0] > best)
+    {
+        best = temp[0];
+        for (int i = 0; i < n; i++)
+            if (thichNghi[i] == best)
+            {
+                for (int j = 0; j < so_luong_item_hientai; j++)
+                    nghiemDeCu[j] = nghiem[i][j];
+                break;
+            }
+    }
+}
+
+void ChonLoc() 
+{
+    float* temp = new float[n];
+    copy(thichNghi, temp, n);
+    sort(temp, n);
+    float nguong = temp[n * 80 / 100];
+    for (int i = 0; i < n; i++)
+    {
+        if (thichNghi[i] <= nguong)
+        {
+            CaThe(nghiem[i]);
+        }
+    }
+}
+
+void LaiGhep() 
+{
+    for (int i = 0; i < 50; i++)
+    {
+        int cha = rand() % n;
+        int me = rand() % n;
+        for (int j = 0; j < so_luong_item_hientai; j++)
+            if (rand() % 2 == 1) {
+                int temp = nghiem[cha][j];
+                nghiem[cha][j] = nghiem[me][j];
+                nghiem[me][j] = temp;
+            }
+    }
+}
+
+void DotBien()
+{
+    for (int i = 0; i < 5; i++)
+    {
+        int index = rand() % n;
+        int bit = rand() % so_luong_item_hientai;
+        if (nghiem[index][bit] == 0)
+            nghiem[index][bit] = 1;
+        else
+            nghiem[index][bit] = 0;
+    }
+}
+
+void GeneticFunction() 
+{
+    KhoiTao();
+    int* nghiemDeCu = new int[so_luong_item_hientai];
+    float best = 0;
+    int gen = 900;
+    for (int i = 1; i <= gen; i++)
+    {
+        DanhGia(nghiemDeCu, best);
+        ChonLoc();
+        LaiGhep();
+        DotBien();
+    }
+    if (best != 0)
+    {
+        float weight = 0;
+        cout << "Goi y: Cac vat dung nen mang theo: " << endl;
+        for (int j = 0; j < so_luong_item_hientai; j++)
+            if (nghiemDeCu[j] == 1)
+            {
+                cout << j + 1 << ". " << it[j].name <<
+                    ": gia( " << it[j].price << " ), can nang( " << it[j].weight << " )" << endl;
+                weight += it[j].weight;
+            }
+        cout << "Tong can nang: " << weight << endl;
+        cout << "Tong gia tri: " << best << endl;
+    }
+    else {
+        cout << "Xin loi, khong tim duoc goi y phu hop!!! Co le balo cua ban qua nho!!" << endl;
+    }
+    delete[] nghiemDeCu;
+}
+
+#pragma endregion
+
+void NhapKhongGian(float& canNang) // Input cua nguoi dung
+{
     cout << "Nhap can nang ban co the mang theo: ";
     cin >> canNang;
 }
@@ -496,12 +653,9 @@ void intro() {
 
 int main()
 {
-    // Thuoc tinh duoc cai dat
-    float canNang;
-    int luaChon;
+    int luaChon; // Tuy chon cua nguoi dung
     bool flag = true; // Chay chuong trinh
 
-    item *it = new item[MAX_ITEM];
     //du_lieu_mau(it);
     sample_item(it);
 
