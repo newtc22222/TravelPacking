@@ -11,12 +11,35 @@
 #include <fstream>
 #include <windows.h>
 #include <conio.h>
+
 #define MAX_ITEM 1000
+
 #define SWAP(type,x,y) do{type tmp = x; x = y; y = tmp;} while(0)
 
 using namespace std;
 
+
+//==================== // MỘT SỐ HÀM PHỤ TRỢ TRONG MÀN HÌNH CONSOLE //=============================
+
+void ClearScreen()  // Ham don sach man hinh 
+{
+    system("cls");
+}
+
+void gotoXY(SHORT posX, SHORT posY)     // hàm dịch con trỏ hiện tại đến điểm có tọa độ(x, y) 
+{
+    HANDLE hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
+    COORD Position;
+    Position.X = posX;
+    Position.Y = posY;
+    SetConsoleCursorPosition(hStdout, Position);
+}
+
+
+//===========================// PHẦN CHÍNH CỦA CHƯƠNG TRÌNH //=====================================
+
 string path = "item.txt";
+
 int so_luong_item_hientai; //Bien quyet dinh so luong
 static int n = 500;  //So luong ca the trong quan the
 int** nghiem = new int* [n];//Mang luu cac ca the
@@ -49,10 +72,6 @@ struct item {
 
 item* it = new item[MAX_ITEM]; //Mang luu tru items
 
-void ClearScreen() {
-    //cout << "\033[2J\033[1;1H"; // magic
-    system("cls");
-}
 
 int length_of_array_item(item it[]) {
     unsigned int x = sizeof(*it) / sizeof(it[0]);
@@ -125,12 +144,12 @@ void LuuThongTinMoi(item it[]) // Luu thong tin da co thay doi vao file
 
 #pragma region Tuong_tac_du_lieu
 void InThongTin(item it) {
-    cout << "-----------------------------------------" << endl;
-    cout << "|Ten vat dung: " << it.name << endl;
-    cout << "|   - Gia thanh: " << it.price << endl;
-    cout << "|   - Can nang: " << it.weight << endl;
-    cout << "|   - Chieu dai: " << it.height << endl;
-    cout << "|   - Chieu rong: " << it.width << endl;
+    cout << "\n\t\t-----------------------------------------";
+    cout << "\n\t\t|Ten vat dung: " << it.name;
+    cout << "\n\t\t|   - Gia thanh: " << it.price;
+    cout << "\n\t\t|   - Can nang: " << it.weight;
+    cout << "\n\t\t|   - Chieu dai: " << it.height;
+    cout << "\n\t\t|   - Chieu rong: " << it.width << endl;
 }
 
 void themItem(item it[]) // Them du lieu hoan toan moi
@@ -154,15 +173,15 @@ void themItem(item it[]) // Them du lieu hoan toan moi
 void NhapThongTinMoi(string& newname, float& newprice, float& newweight, float& newheight, float& newwidth)
 {
     rewind(stdin);
-    cout << "Nhap ten vat dung moi: ";
+    cout << "\n\t\tNhap ten vat dung moi: ";
     getline(cin, newname);
-    cout << "\nNhap gia thanh moi: ";
+    cout << "\n\t\tNhap gia thanh moi: ";
     cin >> newprice;
-    cout << "\nNhap can nang moi: ";
+    cout << "\n\t\tNhap can nang moi: ";
     cin >> newweight;
-    cout << "\nNhap chieu cao moi: ";
+    cout << "\n\t\tNhap chieu cao moi: ";
     cin >> newheight;
-    cout << "\nNhap chieu rong moi: ";
+    cout << "\n\t\tNhap chieu rong moi: ";
     cin >> newwidth;
 }
 
@@ -173,16 +192,16 @@ void suaItem(item it[]) // Tim kiem vat dung theo ten, sau do thuc hien chinh su
     int tmp = 0;
     int n = so_luong_item_hientai;
     rewind(stdin);
-    cout << " Nhap ten san pham muon sua: ";
+    cout << "\n\t\tNhap ten san pham muon sua: ";
     getline(cin, x);
     int found = 0;
     for (int i = 0; i < n; i++)
     {
         if (it[i].name == x)
         {
-            cout << "Thong tin san pham: ";
+            cout << "\n\t\tThong tin san pham: ";
             InThongTin(it[i]);
-            cout << "Nhap thong tin chinh sua: " << endl;
+            cout << "\n\t\tNhap thong tin chinh sua: " << endl;
             NhapThongTinMoi(newname, newprice, newweight, newheight, newwidth); //goi ham nhap 1 san pham de nhap lai san pham
             it[i].name = newname;
             it[i].price = newprice;
@@ -209,7 +228,7 @@ void xoaItem(item it[]) // Tim kiem vat dung, sau do xoa vat dung
 {
     string x;
     int n = so_luong_item_hientai;
-    cout << "Nhap ten san pham can xoa: ";
+    cout << "\n\t\tNhap ten vat dung can xoa: ";
     rewind(stdin);
     getline(cin, x);
     int found = 0;
@@ -223,11 +242,11 @@ void xoaItem(item it[]) // Tim kiem vat dung, sau do xoa vat dung
     }
     if (found == 0)
     {
-        cout << "\n san pham ko toi tai!" << x;
+        cout << "\n\n\tVat dung khong co trong danh sach!";
     }
     else
     {
-        cout << "\n Da xoa SV co ten = " << x;
+        cout << "\n\t\tDa xoa vat dung co ten la: " << x;
         so_luong_item_hientai--;
     }
 }
@@ -309,91 +328,6 @@ bool TimKiemChieuRong(item it[], int n, float x)
     return tmp;
 }
 
-void TimKiemItem(item it[]) // Tim kiem theo ten (hoac lua chon tim kiem theo gia/can nang/chieu dai/chieu rong)
-{
-    int choose;
-    int n = so_luong_item_hientai;
-    string x;
-    float t;
-    bool tmp = true;
-    while (tmp)
-    {
-        cout << "=====================================\n";
-        cout << "| 1. Tim kiem theo Ten              |\n";
-        cout << "| 2. Tim kiem theo Gia              |\n";
-        cout << "| 3. Tim kiem theo Can Nang         |\n";
-        cout << "| 4. Tim kiem theo Chieu Dai        |\n";
-        cout << "| 5. Tim kiem heo Chieu Rong        |\n";
-        cout << "| 0. Tro ve menu chinh              |\n";
-        cout << "=====================================\n";
-        cout << " Moi nhap lua chon: ";
-        cin >> choose;
-        switch (choose)
-        {
-        case 1:
-        {
-            ClearScreen();
-            cout << "Nhap ten san pham ban can tim: ";
-            rewind(stdin);
-            getline(cin, x);
-            if (!TimKiemTen(it, n, x))
-                cout << "\nKhong co san pham co ten nay!\n";
-
-            break;
-        }
-        case 2:
-        {
-            ClearScreen();
-            cout << "Nhap gia can tim kiem: ";
-            cin >> t;
-            if (!TimKiemGia(it, n, t))
-                cout << "\nKhong co san pham co gia nay!\n";
-
-            break;
-        }
-        case 3:
-        {
-            ClearScreen();
-            cout << "Nhap can nang can tim kiem: ";
-            cin >> t;
-            if (!TimKiemCanNang(it, n, t))
-                cout << "\nKhong co san pham co can nang nay!\n";
-
-            break;
-        }
-        case 4:
-        {
-            ClearScreen();
-            cout << "Nhap chieu dai can tim kiem: ";
-            cin >> t;
-            if (!TimKiemChieuDai(it, n, t))
-                cout << "\nKhong co san pham co chieu dai nay!\n";
-            break;
-        }
-        case 5:
-        {
-            ClearScreen();
-            cout << "Nhap chieu rong can tim kiem: ";
-            cin >> t;
-            if (!TimKiemChieuRong(it, n, t))
-                cout << "\nKhong co san pham co chieu rong nay!\n";
-
-            break;
-        }
-        case 0:
-        {
-            ClearScreen();
-            tmp = false;
-            break;
-        }
-        default:
-        {
-            cout << "\nKhong co chuc nang nay!" << endl;
-            break;
-        }
-        }
-    }
-}
 #pragma endregion
 
 #pragma region Sap_xep
@@ -425,58 +359,6 @@ void sapXepTen(item it[])
         for (int j = i + 1; j < so_luong_item_hientai; j++) {
             if (it[i].name.compare(it[j].name) > 0)
                 SWAP(item, it[i], it[j]);
-        }
-    }
-}
-
-void SapXepItem(item it[]) // Sap xep tuy y (theo lua chon cua nguoi dung)
-{
-    int choose;
-    bool flag = true;
-    while (flag)
-    {
-        cout << "=====================================\n";
-        cout << "| 1. Sap xep theo Ten               |\n";
-        cout << "| 2. Sap xep theo Gia               |\n";
-        cout << "| 3. Sap xep theo Can Nang          |\n";
-        cout << "| 0. Tro ve menu chinh              |\n";
-        cout << "=====================================\n";
-        cout << " Moi nhap lua chon: ";
-        cin >> choose;
-        switch (choose)
-        {
-        case 1:
-        {
-            ClearScreen();
-            sapXepTen(it);
-            LietKeItem(it, so_luong_item_hientai);
-            break;
-        }
-        case 2:
-        {
-            ClearScreen();
-            sapXepGia(it);
-            LietKeItem(it, so_luong_item_hientai);
-            break;
-        }
-        case 3:
-        {
-            ClearScreen();
-            sapXepCanNang(it);
-            LietKeItem(it, so_luong_item_hientai);
-            break;
-        }
-        case 0:
-        {
-            ClearScreen();
-            flag = false;
-            break;
-        }
-        default:
-        {
-            cout << "\nKhong co chuc nang nay!" << endl;
-            break;
-        }
         }
     }
 }
@@ -553,7 +435,7 @@ void DanhGia(int nghiemDeCu[], float& best) //Danh gia do thich nghi va tim ca t
     }
 }
 
-void ChonLoc() 
+void ChonLoc()
 {
     float* temp = new float[n];
     copy(thichNghi, temp, n);
@@ -568,7 +450,7 @@ void ChonLoc()
     }
 }
 
-void LaiGhep() 
+void LaiGhep()
 {
     for (int i = 0; i < 50; i++)
     {
@@ -596,12 +478,12 @@ void DotBien()
     }
 }
 
-void GeneticFunction() 
+void GeneticFunction()
 {
     KhoiTao();
     int* nghiemDeCu = new int[so_luong_item_hientai];
     float best = 0;
-    int gen = 900;
+    int gen = 1000;
     for (int i = 1; i <= gen; i++)
     {
         DanhGia(nghiemDeCu, best);
@@ -612,19 +494,19 @@ void GeneticFunction()
     if (best != 0)
     {
         float weight = 0;
-        cout << "Goi y: Cac vat dung nen mang theo: " << endl;
+        cout << "\n\t\tGoi y: Cac vat dung nen mang theo: " << endl;
         for (int j = 0; j < so_luong_item_hientai; j++)
             if (nghiemDeCu[j] == 1)
             {
-                cout << j + 1 << ". " << it[j].name <<
+                cout << "\n\t\t" << j + 1 << ". " << it[j].name <<
                     ": gia( " << it[j].price << " ), can nang( " << it[j].weight << " )" << endl;
                 weight += it[j].weight;
             }
-        cout << "Tong can nang: " << weight << endl;
-        cout << "Tong gia tri: " << best << endl;
+        cout << "\n\t\tTong can nang: " << weight << endl;
+        cout << "\n\t\tTong gia tri: " << best << endl;
     }
     else {
-        cout << "Xin loi, khong tim duoc goi y phu hop!!! Co le balo cua ban qua nho!!" << endl;
+        cout << "\n\t\tXin loi, khong tim duoc goi y phu hop!!! Co le balo cua ban qua nho!!" << endl;
     }
     delete[] nghiemDeCu;
 }
@@ -633,76 +515,1043 @@ void GeneticFunction()
 
 void NhapKhongGian(float& canNang) // Input cua nguoi dung
 {
-    cout << "Nhap can nang ban co the mang theo: ";
+    cout << "\n\t\tNhap can nang ban co the mang theo: ";
     cin >> canNang;
 }
 
-void intro() {
-    cout << "------------------------------------------------------" << endl;
-    cout << "|Chuong trinh sap xep hanh ly cho cac chuyen di choi!|" << endl;
-    cout << "|   1. Liet ke cac vat dung co san                   |" << endl;
-    cout << "|   2. Them mot vat dung                             |" << endl;
-    cout << "|   3. Sua mot vat dung                              |" << endl;
-    cout << "|   4. Xoa mot vat dung                              |" << endl;
-    cout << "|   5. Tim kiem vat dung                             |" << endl;
-    cout << "|   6. Sap xep thong tin vat dung                    |" << endl;
-    cout << "|   7. Goi y vat dung mang theo                      |" << endl;
-    cout << "|   Khac. Thoat khoi chuong trinh                    |" << endl;
-    cout << "------------------------------------------------------" << endl;
+
+//=====================================// PHAN CODE CHO MENU DONG //===================================================
+
+int x = 40, y = 9;
+int w = 30, h = 2, t_color = 11, b_color = 1, b_color_sang = 75;
+
+void SetColor(WORD color) //Hàm đặt màu cho chữ 
+{
+    HANDLE hConsoleOutput;
+    hConsoleOutput = GetStdHandle(STD_OUTPUT_HANDLE);
+    CONSOLE_SCREEN_BUFFER_INFO screen_buffer_info;
+    GetConsoleScreenBufferInfo(hConsoleOutput, &screen_buffer_info);
+    WORD wAttributes = screen_buffer_info.wAttributes;
+    color &= 0x000f;
+    wAttributes &= 0xfff0;
+    wAttributes |= color;
+    SetConsoleTextAttribute(hConsoleOutput, wAttributes);
 }
+
+void textcolor(int x) //Hàm đặt màu nền
+{
+    HANDLE mau;
+    mau = GetStdHandle(STD_OUTPUT_HANDLE);
+    SetConsoleTextAttribute(mau, x);
+}
+
+void ShowCur(bool CursorVisibility) // Hàm làm ẩn con trỏ chuột 
+{
+    HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
+    CONSOLE_CURSOR_INFO cursor = { 1, CursorVisibility };
+    SetConsoleCursorInfo(handle, &cursor);
+}
+
+void thanh_sang(int xp, int yp, int w, int h, int b_color, string nd) //Hàm để tạo thanh sáng cho menu
+{
+    textcolor(b_color);
+    for (int iy = yp + 1; iy <= yp + h - 1; iy++)
+    {
+        for (int ix = xp + 1; ix <= xp + w - 1; ix++)
+        {
+            gotoXY(ix, iy); cout << " ";
+        }
+    }
+    SetColor(7);
+    gotoXY(xp + 1, yp + 1);
+    cout << nd;
+}
+
+void box(int x, int y, int w, int h, int t_color, int b_color, string nd)    //Hàm tạo một ô của menu động 
+{
+    textcolor(b_color);
+    for (int iy = y + 1; iy <= y + h - 1; iy++)
+    {
+        for (int ix = x + 1; ix <= x + w - 1; ix++)
+        {
+            gotoXY(ix, iy); cout << " ";
+        }
+    }
+    SetColor(7);
+    gotoXY(x + 1, y + 1);
+    cout << nd;
+    textcolor(1);                //Vẽ viền cho menu
+    SetColor(t_color);
+    if (h <= 1 || w <= 1)return;
+    for (int ix = x; ix <= x + w; ix++)
+    {
+        gotoXY(ix, y);
+        cout << "-";
+        gotoXY(ix, y + h);
+        cout << "-";
+    }
+    for (int iy = y; iy <= y + h; iy++)
+    {
+        gotoXY(x, iy);
+        cout << "|";
+        gotoXY(x + w, iy);
+        cout << "|";
+    }
+    gotoXY(x, y); cout << "+";
+    gotoXY(x + w, y); cout << "+";
+    gotoXY(x, y + h); cout << "+";
+    gotoXY(x + w, y + h); cout << "+";
+
+}
+
+void n_box(int x, int y, int w, int h, int t_color, int b_color, string nd[], int sl)   //Hàm tạo nhiều ô của menu động 
+{
+    for (int i = 0; i < sl; i++)
+    {
+        box(x, y + (i * 2), w, h, t_color, b_color, nd[i]);
+        if (i != 0)
+        {
+            gotoXY(x, y + (i * 2)); cout << "|";
+            gotoXY(x + w, y + (i * 2)); cout << "|";
+        }
+    }
+}
+
+void DisableResizeWindow() //Hàm đặt tên cho màn hình console
+{
+    HWND hWnd = GetConsoleWindow();
+    SetWindowLong(hWnd, GWL_STYLE, GetWindowLong(hWnd, GWL_STYLE) & ~WS_SIZEBOX);
+}
+
+void DisableCtrButton(bool Close, bool Min, bool Max) //Hàm tắt thu phóng max size, min size của màn hình console
+{
+    HWND hWnd = GetConsoleWindow();
+    HMENU hMenu = GetSystemMenu(hWnd, false);
+
+    if (Close == 1)
+    {
+        DeleteMenu(hMenu, SC_CLOSE, MF_BYCOMMAND);
+    }
+    if (Min == 1)
+    {
+        DeleteMenu(hMenu, SC_MINIMIZE, MF_BYCOMMAND);
+    }
+    if (Max == 1)
+    {
+        DeleteMenu(hMenu, SC_MAXIMIZE, MF_BYCOMMAND);
+    }
+}
+
+enum stase // enum lua chon chuc nang cua menu chinh 
+{
+    MENU = 0, OUTPUT, ADD, EDIT, DEL, SEARCH, SORT, SUGGEST, EXIT
+}Stase;
+
+
+//===========================// CÁC MENU CHÍNH VÀ MENU CON CỦA CHƯƠNG TRÌNH //=============================
+
+void Output(item it[], int so_luong_item_hientai)                //Menu xuat danh sách trong chương trình
+{
+    SetColor(15);
+    gotoXY(43, 2);
+    cout << " >>> XUAT DANH SACH <<<";
+    gotoXY(7, 5);
+    SetColor(15);
+    cout << "Nhan phim di chuyen << LEN >> hoac << XUONG >> de tuy chinh va nhan phim di chuyen << SANG PHAI >> de chon";
+    ShowCur(0);
+    string nd[3] = { "Xuat danh sach", "Thoat" };
+    int sl = 2, i, j;
+    n_box(x, y, w, h, t_color, b_color, nd, sl);
+    int xp = x, yp = y;
+    int xcu = xp; int ycu = yp;									//toa do anh sang
+    bool kt = true;
+    while (Stase == OUTPUT)
+    {
+        if (kt == true)											//------ in ----
+        {
+            i = abs((y - ycu) / 2);
+            gotoXY(xcu, ycu);									//----- back space ----
+            thanh_sang(xcu, ycu, w, h, b_color, nd[i]);          //rs thanh sang cu
+            xcu = xp; ycu = yp;
+            j = abs((y - ycu) / 2);
+            thanh_sang(xp, yp, w, h, b_color_sang, nd[j]);
+            kt = false;
+        }
+        if (_kbhit())											// dieu khien bang phim di chuyen tren ban phim
+        {
+            rewind(stdin);
+            char c = _getch();
+            if (c == -32)
+            {
+                kt = true;										// khi đã bấm
+                c = _getch();
+                if (c == 72)									// di chuyển xuống
+                {
+                    if (yp != y)
+                        yp -= 2;
+                    else
+                    {
+                        yp = y + h * (sl - 1);
+                    }
+                }
+                else if (c == 80)							   //di chuyển lên
+                {
+                    if (yp != y + h * (sl - 1))
+                        yp += 2;
+                    else
+                    {
+                        yp = y;
+                    }
+                }
+                else if (c == 77)
+                {
+                    textcolor(b_color);
+                    ClearScreen();
+                    gotoXY(40, 10);
+                    switch (j)
+                    {
+                    case 0:
+                    {
+                        ClearScreen();
+                        SetColor(15);
+                        LietKeItem(it, so_luong_item_hientai);
+                        cout << "\n\t\t\t\t\t  DA XUAT DANH SACH THANH CONG!";
+                        cout << "\n\t\t\t\t\tNHAN PHIM << SPACE >> DE TRO VE !";
+                        rewind(stdin);
+                        char t = _getch();
+                        if (t == 32)
+                        {
+                            Stase = MENU;
+                            ClearScreen();
+                        }
+                        break;
+                    }
+                    case 1:
+                    {
+                        Stase = MENU;
+                        break;
+                    }
+                    }
+                }
+            }
+        }
+    }
+}
+
+void Add(item it[])                    //Menu them vật dụng trong chương trình
+{
+    SetColor(15);
+    gotoXY(43, 2);
+    cout << " >>> THEM DANH SACH <<<";
+    gotoXY(7, 5);
+    SetColor(15);
+    cout << "Nhan phim di chuyen << LEN >> hoac << XUONG >> de tuy chinh va nhan phim di chuyen << SANG PHAI >> de chon";
+    ShowCur(0);
+    string nd[3] = { "Nhap du lieu", "Thoat" };
+    int sl = 2, i, j;
+    n_box(x, y, w, h, t_color, b_color, nd, sl);
+    int xp = x, yp = y;
+    int xcu = xp; int ycu = yp;									//toa do anh sang
+    bool kt = true;
+    while (Stase == ADD)
+    {
+        if (kt == true)											//------ in ----
+        {
+            i = abs((y - ycu) / 2);
+            gotoXY(xcu, ycu);									//----- back space ----
+            thanh_sang(xcu, ycu, w, h, b_color, nd[i]);          //rs thanh sang cu
+            xcu = xp; ycu = yp;
+            j = abs((y - ycu) / 2);
+            thanh_sang(xp, yp, w, h, b_color_sang, nd[j]);
+            kt = false;
+        }
+        if (_kbhit())											// dieu khien bang phim di chuyen tren ban phim
+        {
+            rewind(stdin);
+            char c = _getch();
+            if (c == -32)
+            {
+                kt = true;										// khi đã bấm
+                c = _getch();
+                if (c == 72)									// di chuyển xuống
+                {
+                    if (yp != y)
+                        yp -= 2;
+                    else
+                    {
+                        yp = y + h * (sl - 1);
+                    }
+                }
+                else if (c == 80)							   //di chuyển lên
+                {
+                    if (yp != y + h * (sl - 1))
+                        yp += 2;
+                    else
+                    {
+                        yp = y;
+                    }
+                }
+                else if (c == 77)
+                {
+
+                    textcolor(b_color);
+                    ClearScreen();
+                    switch (j)
+                    {
+                    case 0:
+                    {
+                        ClearScreen();
+                        SetColor(15);
+                        themItem(it);
+                        cout << "\n\t\t\t\t\t   DA NHAP DU LIEU THANH CONG!   ";
+                        cout << "\n\t\t\t\t\tNHAN PHIM << SPACE >> DE TRO VE !";
+                        rewind(stdin);
+                        char t = _getch();
+                        if (t == 32)
+                        {
+                            Stase = MENU;
+                            ClearScreen();
+                        }
+                        break;
+                    }
+                    case 1:
+                    {
+                        Stase = MENU;
+                        break;
+                    }
+                    }
+                }
+            }
+        }
+    }
+}
+
+void Del(item it[])							// Menu cua ham xoa vật dụng trong chương trình
+{
+    SetColor(15);
+    gotoXY(43, 2);
+    cout << " >>> XOA DANH SACH <<<";
+    gotoXY(7, 5);
+    SetColor(15);
+    cout << "Nhan phim di chuyen << LEN >> hoac << XUONG >> de tuy chinh va nhan phim di chuyen<< SANG PHAI >> de chon";
+    ShowCur(0);
+    string nd[3] = { "Xoa mot vat dung", "Thoat" };
+    int sl = 2, i, j;
+    n_box(x, y, w, h, t_color, b_color, nd, sl);
+    int xp = x, yp = y;
+    int xcu = xp; int ycu = yp;									//toa do anh sang
+    bool kt = true;
+    while (Stase == DEL)
+    {
+        if (kt == true)											//------ in ----
+        {
+            i = abs((y - ycu) / 2);
+            gotoXY(xcu, ycu);									//----- back space ----
+            thanh_sang(xcu, ycu, w, h, b_color, nd[i]);          //rs thanh sang cu
+            xcu = xp; ycu = yp;
+            j = abs((y - ycu) / 2);
+            thanh_sang(xp, yp, w, h, b_color_sang, nd[j]);
+            kt = false;
+        }
+        if (_kbhit())											// dieu khien bang phim di chuyen tren ban phim
+        {
+            rewind(stdin);
+            char c = _getch();
+            if (c == -32)
+            {
+                kt = true;										// khi đã bấm
+                c = _getch();
+                if (c == 72)									// di chuyển xuống
+                {
+                    if (yp != y)
+                        yp -= 2;
+                    else
+                    {
+                        yp = y + h * (sl - 1);
+                    }
+                }
+                else if (c == 80)							   //di chuyển lên
+                {
+                    if (yp != y + h * (sl - 1))
+                        yp += 2;
+                    else
+                    {
+                        yp = y;
+                    }
+                }
+                else if (c == 77)
+                {
+                    textcolor(b_color);
+                    ClearScreen();
+                    gotoXY(40, 10);
+                    switch (j)
+                    {
+                    case 0:
+                    {
+                        ClearScreen();
+                        SetColor(15);
+                        xoaItem(it);
+                        cout << "\n\t\t\t\t\tNHAN PHIM << SPACE >> DE TRO VE !";
+                        rewind(stdin);
+                        char t = _getch();
+                        if (t == 32)
+                        {
+                            Stase = MENU;
+                            ClearScreen();
+                        }
+                        break;
+                    }
+                    case 1:
+                    {
+                        ClearScreen();
+                        Stase = MENU;
+                        break;
+                    }
+                    }
+                }
+            }
+        }
+    }
+}
+
+void Edit(item it[])							//Menu cua ham chinh sua các vật dụng trong chương trình
+{
+    SetColor(15);
+    gotoXY(43, 2);
+    cout << " >>> SUA DANH SACH <<<";
+    gotoXY(7, 5);
+    SetColor(15);
+    cout << "Nhan phim di chuyen << LEN >> hoac << XUONG >> de tuy chinh va nhan phim di chuyen << SANG PHAI >> de chon";
+    ShowCur(0);
+    string nd[3] = { "Sua mot vat dung", "Thoat" };
+    int sl = 2, i, j;
+    n_box(x, y, w, h, t_color, b_color, nd, sl);
+    int xp = x, yp = y;
+    int xcu = xp; int ycu = yp;									//toa do anh sang
+    bool kt = true;
+    while (Stase == EDIT)
+    {
+        if (kt == true)											//------ in ----
+        {
+            i = abs((y - ycu) / 2);
+            gotoXY(xcu, ycu);									//----- back space ----
+            thanh_sang(xcu, ycu, w, h, b_color, nd[i]);          //rs thanh sang cu
+            xcu = xp; ycu = yp;
+            j = abs((y - ycu) / 2);
+            thanh_sang(xp, yp, w, h, b_color_sang, nd[j]);
+            kt = false;
+        }
+        if (_kbhit())											// dieu khien bang phim di chuyen tren ban phim
+        {
+            rewind(stdin);
+            char c = _getch();
+            if (c == -32)
+            {
+                kt = true;										// khi đã bấm
+                c = _getch();
+                if (c == 72)									// di chuyển xuống
+                {
+                    if (yp != y)
+                        yp -= 2;
+                    else
+                    {
+                        yp = y + h * (sl - 1);
+                    }
+                }
+                else if (c == 80)							   //di chuyển lên
+                {
+                    if (yp != y + h * (sl - 1))
+                        yp += 2;
+                    else
+                    {
+                        yp = y;
+                    }
+                }
+                else if (c == 77)
+                {
+                    textcolor(b_color);
+                    ClearScreen();
+                    gotoXY(40, 10);
+                    switch (j)
+                    {
+                    case 0:
+                    {
+                        ClearScreen();
+                        SetColor(15);
+                        suaItem(it);
+                        cout << "\n\t\t\t\t\tNHAN PHIM << SPACE >> DE TRO VE !";
+                        rewind(stdin);
+                        char t = _getch();
+                        if (t == 32)
+                        {
+                            Stase = MENU;
+                            ClearScreen();
+                        }
+                        break;
+                    }
+                    case 1:
+                    {
+                        ClearScreen();
+                        Stase = MENU;
+                        break;
+                    }
+                    }
+                }
+            }
+        }
+    }
+}
+
+void Search(item it[])						//Menu cua ham tim kiem các vật dụng trong chương trình
+{
+    int n = so_luong_item_hientai;
+    string p;
+    float t;
+    SetColor(15);
+    gotoXY(41, 2);
+    cout << " >>> TIM KIEM DANH SACH <<<";
+    gotoXY(7, 5);
+    SetColor(15);
+    cout << "Nhan phim di chuyen << LEN >> hoac << XUONG >> de tuy chinh va nhan phim di chuyen << SANG PHAI >> de chon";
+    ShowCur(0);
+    string nd[7] = { "Tim kiem theo ten", "Tim kiem theo gia","Tim kiem theo can nang",
+                                        "Tim kiem theo chieu dai","Tim kiem theo chieu rong", "Thoat" };
+    int sl = 6, i, j;
+    n_box(x, y, w, h, t_color, b_color, nd, sl);
+    int xp = x, yp = y;
+    int xcu = xp; int ycu = yp;									//toa do anh sang
+    bool kt = true;
+    while (Stase == SEARCH)
+    {
+        if (kt == true)											//------ in ----
+        {
+            i = abs((y - ycu) / 2);
+            gotoXY(xcu, ycu);									//----- back space ----
+            thanh_sang(xcu, ycu, w, h, b_color, nd[i]);          //rs thanh sang cu
+            xcu = xp; ycu = yp;
+            j = abs((y - ycu) / 2);
+            thanh_sang(xp, yp, w, h, b_color_sang, nd[j]);
+            kt = false;
+        }
+        if (_kbhit())											// dieu khien bang phim di chuyen tren ban phim
+        {
+            rewind(stdin);
+            char c = _getch();
+            if (c == -32)
+            {
+                kt = true;										// khi đã bấm
+                c = _getch();
+                if (c == 72)									// di chuyển xuống
+                {
+                    if (yp != y)
+                        yp -= 2;
+                    else
+                    {
+                        yp = y + h * (sl - 1);
+                    }
+                }
+                else if (c == 80)							   //di chuyển lên
+                {
+                    if (yp != y + h * (sl - 1))
+                        yp += 2;
+                    else
+                    {
+                        yp = y;
+                    }
+                }
+                else if (c == 77)
+                {
+                    textcolor(b_color);
+                    ClearScreen();
+                    switch (j)
+                    {
+                    case 0:
+                    {
+                        ClearScreen();
+                        SetColor(15);
+                        cout << "\n\t\tNhap ten vat dung ban can tim: ";
+                        rewind(stdin);
+                        getline(cin, p);
+                        if (!TimKiemTen(it, n, p))
+                            cout << "\n\t\tKhong co vat dung co ten nay!\n";
+                        cout << "\n\t\t\t\t\tNHAN PHIM << SPACE >> DE TRO VE !";
+                        char t = _getch();
+                        if (t == 32)
+                        {
+                            Stase = MENU;
+                            ClearScreen();
+                        }
+                        break;
+                    }
+                    case 1:
+                    {
+                        ClearScreen();
+                        SetColor(15);
+                        rewind(stdin);
+                        ClearScreen();
+                        cout << "\n\t\tNhap gia can tim kiem: ";
+                        cin >> t;
+                        if (!TimKiemGia(it, n, t))
+                            cout << "\n\t\tKhong co vat dung co gia nay!\n";
+                        cout << "\n\t\t\t\t\tNHAN PHIM << SPACE >> DE TRO VE !";
+                        char t = _getch();
+                        if (t == 32)
+                        {
+                            Stase = MENU;
+                            ClearScreen();
+                        }
+                        break;
+                    }
+                    case 2:
+                    {
+                        ClearScreen();
+                        SetColor(15);
+                        cout << "\n\t\tNhap can nang can tim kiem: ";
+                        cin >> t;
+                        if (!TimKiemCanNang(it, n, t))
+                            cout << "\n\t\tKhong co vat dung co can nang nay!\n";
+                        rewind(stdin);
+                        char t = _getch();
+                        if (t == 32)
+                        {
+                            Stase = MENU;
+                            ClearScreen();
+                        }
+                        break;
+                    }
+                    case 3:
+                    {
+                        ClearScreen();
+                        cout << "\n\t\tNhap chieu dai can tim kiem: ";
+                        cin >> t;
+                        if (!TimKiemChieuDai(it, n, t))
+                            cout << "\n\t\tKhong co vat dung co chieu dai nay!\n";
+                        rewind(stdin);
+                        char t = _getch();
+                        if (t == 32)
+                        {
+                            Stase = MENU;
+                            ClearScreen();
+                        }
+                        break;
+                    }
+                    case 4:
+                    {
+                        ClearScreen();
+                        cout << "\n\t\tNhap chieu rong can tim kiem: ";
+                        cin >> t;
+                        if (!TimKiemChieuRong(it, n, t))
+                            cout << "\n\t\tKhong co vat dung co chieu rong nay!\n";
+                        rewind(stdin);
+                        char t = _getch();
+                        if (t == 32)
+                        {
+                            Stase = MENU;
+                            ClearScreen();
+                        }
+                        break;
+                    }
+                    case 5:
+                    {
+                        ClearScreen();
+                        Stase = MENU;
+                        break;
+                    }
+                    }
+                }
+            }
+        }
+    }
+}
+
+void Sort(item it[])							//Menu cua ham sắp xếp các vật trong trong danh sách
+{
+    SetColor(15);
+    gotoXY(41, 2);
+    cout << " >>> SAP XEP DANH SACH <<<";
+    gotoXY(7, 5);
+    SetColor(15);
+    cout << "Nhan phim di chuyen << LEN >> hoac << XUONG >> de tuy chinh va nhan phim di chuyen << SANG PHAI >> de chon";
+    ShowCur(0);
+    string nd[5] = { "Sap xep theo ten","Sap xep theo gia","Sap xep teo can nang ", "Thoat" };
+    int sl = 4, i, j;
+    n_box(x, y, w, h, t_color, b_color, nd, sl);
+    int xp = x, yp = y;
+    int xcu = xp; int ycu = yp;									//toa do anh sang
+    bool kt = true;
+    while (Stase == SORT)
+    {
+        if (kt == true)											//------ in ----
+        {
+            i = abs((y - ycu) / 2);
+            gotoXY(xcu, ycu);									//----- back space ----
+            thanh_sang(xcu, ycu, w, h, b_color, nd[i]);          //rs thanh sang cu
+            xcu = xp; ycu = yp;
+            j = abs((y - ycu) / 2);
+            thanh_sang(xp, yp, w, h, b_color_sang, nd[j]);
+            kt = false;
+        }
+        if (_kbhit())											// dieu khien bang phim di chuyen tren ban phim
+        {
+            rewind(stdin);
+            char c = _getch();
+            if (c == -32)
+            {
+                kt = true;										// khi đã bấm
+                c = _getch();
+                if (c == 72)									// di chuyển xuống
+                {
+                    if (yp != y)
+                        yp -= 2;
+                    else
+                    {
+                        yp = y + h * (sl - 1);
+                    }
+                }
+                else if (c == 80)							   //di chuyển lên
+                {
+                    if (yp != y + h * (sl - 1))
+                        yp += 2;
+                    else
+                    {
+                        yp = y;
+                    }
+                }
+                else if (c == 77)
+                {
+                    textcolor(b_color);
+                    ClearScreen();
+                    gotoXY(40, 10);
+                    switch (j)
+                    {
+                    case 0:
+                    {
+                        ClearScreen();
+                        SetColor(15);
+                        sapXepTen(it);
+                        LietKeItem(it, so_luong_item_hientai);
+                        cout << "\n\t\t\t\t\t     DA SAP XEP THAH CONG!       ";
+                        cout << "\n\t\t\t\t\tNHAN PHIM << SPACE >> DE TRO VE !";
+                        rewind(stdin);
+                        char t = _getch();
+                        if (t == 32)
+                        {
+                            Stase = MENU;
+                            ClearScreen();
+                        }
+                        break;
+                    }
+                    case 1:
+                    {
+                        ClearScreen();
+                        sapXepGia(it);
+                        LietKeItem(it, so_luong_item_hientai);
+                        cout << "\n\t\t\t\t\t     DA SAP XEP THAH CONG!       ";
+                        cout << "\n\t\t\t\t\tNHAN PHIM << SPACE >> DE TRO VE !";
+                        rewind(stdin);
+                        char t = _getch();
+                        if (t == 32)
+                        {
+                            Stase = MENU;
+                            ClearScreen();
+                        }
+                        break;
+                    }
+                    case 2:
+                    {
+                        ClearScreen();
+                        sapXepCanNang(it);
+                        LietKeItem(it, so_luong_item_hientai);
+                        cout << "\n\t\t\t\t\t     DA SAP XEP THAH CONG!       ";
+                        cout << "\n\t\t\t\t\tNHAN PHIM << SPACE >> DE TRO VE !";
+                        rewind(stdin);
+                        char t = _getch();
+                        if (t == 32)
+                        {
+                            Stase = MENU;
+                            ClearScreen();
+                        }
+                        break;
+                    }
+                    case 3:
+                    {
+                        ClearScreen();
+                        Stase = MENU;
+                        break;
+                    }
+                    }
+                }
+            }
+        }
+    }
+}
+
+void Suggest(item it[])                     //Menu chứa hàm gợi ý các vật dụng  trong chương trình
+{
+    SetColor(15);
+    gotoXY(42, 2);
+    cout << " >>> GOI Y DANH SACH <<<";
+    gotoXY(7, 5);
+    SetColor(15);
+    cout << "Nhan phim di chuyen << LEN >> hoac << XUONG >> de tuy chinh va nhan phim di chuyen << SANG PHAI >> de chon";
+    ShowCur(0);
+    string nd[3] = { "Goi y vat dung mang theo", "Thoat" };
+    int sl = 2, i, j;
+    n_box(x, y, w, h, t_color, b_color, nd, sl);
+    int xp = x, yp = y;
+    int xcu = xp; int ycu = yp;									//toa do anh sang
+    bool kt = true;
+    while (Stase == SUGGEST)
+    {
+        if (kt == true)											//------ in ----
+        {
+            i = abs((y - ycu) / 2);
+            gotoXY(xcu, ycu);									//----- back space ----
+            thanh_sang(xcu, ycu, w, h, b_color, nd[i]);          //rs thanh sang cu
+            xcu = xp; ycu = yp;
+            j = abs((y - ycu) / 2);
+            thanh_sang(xp, yp, w, h, b_color_sang, nd[j]);
+            kt = false;
+        }
+        if (_kbhit())											// dieu khien bang phim di chuyen tren ban phim
+        {
+            rewind(stdin);
+            char c = _getch();
+            if (c == -32)
+            {
+                kt = true;										// khi đã bấm
+                c = _getch();
+                if (c == 72)									// di chuyển xuống
+                {
+                    if (yp != y)
+                        yp -= 2;
+                    else
+                    {
+                        yp = y + h * (sl - 1);
+                    }
+                }
+                else if (c == 80)							   //di chuyển lên
+                {
+                    if (yp != y + h * (sl - 1))
+                        yp += 2;
+                    else
+                    {
+                        yp = y;
+                    }
+                }
+                else if (c == 77)
+                {
+                    textcolor(b_color);
+                    ClearScreen();
+                    gotoXY(40, 10);
+                    switch (j)
+                    {
+                    case 0:
+                    {
+                        ClearScreen();
+                        SetColor(15);
+                        NhapKhongGian(canNang);
+                        GeneticFunction();
+                        cout << "\n\t\t\t\t\tNHAN PHIM << SPACE >> DE TRO VE !";
+                        rewind(stdin);
+                        char t = _getch();
+                        if (t == 32)
+                        {
+                            Stase = MENU;
+                            ClearScreen();
+                        }
+                        break;
+                    }
+
+                    case 1:
+                    {
+                        ClearScreen();
+                        Stase = MENU;
+                        break;
+                    }
+                    }
+                }
+            }
+        }
+    }
+}
+
+void Menu(item it[])							//Menu chinh cua chuong trinh
+{
+    SetColor(15);
+    gotoXY(28, 2);
+    cout << " CHAO MUNG BAN DEN VOI CHUONG TRINH SAP XEP HANH LI ";
+    gotoXY(7, 5);
+    SetColor(15);
+    cout << "Nhan phim di chuyen << LEN >> hoac << XUONG >> de tuy chinh va nhan phim di chuyen << SANG PHAI >> de chon";
+    ShowCur(0);
+    string nd[9] = { "Liet ke cac vat pham co san","Them mot vat dung","Sua mot vat dung","Xoa mot vat dung",
+                                "Tim kiem vat dung","Sap xep thong tin vat dung","Goi y vat dung mang theo","Thoat" };
+    int sl = 8, i, j;
+    n_box(x, y, w, h, t_color, b_color, nd, sl);
+    int xp = x, yp = y;
+    int xcu = xp; int ycu = yp;									//toa do anh sang
+    bool kt = true;
+    while (Stase == MENU)
+    {
+        if (kt == true)											//------ in ----
+        {
+            i = abs((y - ycu) / 2);
+            gotoXY(xcu, ycu);									//----- back space ----
+            thanh_sang(xcu, ycu, w, h, b_color, nd[i]);          //rs thanh sang cu
+            xcu = xp; ycu = yp;
+            j = abs((y - ycu) / 2);
+            thanh_sang(xp, yp, w, h, b_color_sang, nd[j]);
+            kt = false;
+        }
+        if (_kbhit())											// dieu khien bang phim di chuyen tren ban phim
+        {
+            rewind(stdin);
+            char c = _getch();
+            if (c == -32)
+            {
+                kt = true;										// khi đã bấm
+                c = _getch();
+                if (c == 72)									// di chuyển xuống
+                {
+                    if (yp != y)
+                        yp -= 2;
+                    else
+                    {
+                        yp = y + h * (sl - 1);
+                    }
+                }
+                else if (c == 80)							   //di chuyển lên
+                {
+                    if (yp != y + h * (sl - 1))
+                        yp += 2;
+                    else
+                    {
+                        yp = y;
+                    }
+                }
+                else if (c == 77)
+                {
+                    textcolor(b_color);
+                    ClearScreen();
+                    gotoXY(40, 10);
+                    switch (j)
+                    {
+                    case 0:
+                    {
+                        Stase = OUTPUT;
+                        break;
+                    }
+                    case 1:
+                    {
+                        Stase = ADD;
+                        break;
+                    }
+                    case 2:
+                    {
+                        Stase = EDIT;
+                        break;
+                    }
+                    case 3:
+                    {
+                        Stase = DEL;
+                        break;
+                    }
+                    case 4:
+                    {
+                        Stase = SEARCH;
+                        break;
+                    }
+                    case 5:
+                    {
+                        Stase = SORT;
+                        break;
+                    }
+                    case 6:
+                    {
+                        Stase = SUGGEST;
+                        break;
+                    }
+                    case 7:
+                    {
+                        Stase = EXIT;
+                        break;
+                    }
+                    }
+                }
+            }
+        }
+    }
+}
+
+//==================================// HÀM MAIN //========================================================
 
 int main()
 {
-    int luaChon; // Tuy chon cua nguoi dung
-    bool flag = true; // Chay chuong trinh
+    DisableCtrButton(0, 1, 1);
+    DisableResizeWindow();
+    SetConsoleTitle(L"ARANGE LUGGAGE");
 
     //du_lieu_mau(it);
     sample_item(it);
-
-    while (flag) {
-        intro();
-        cout << "Moi ban nhap lua chon: ";
-        cin >> luaChon;
-        switch (luaChon)
+    Stase = MENU;
+    Menu(it);
+    while (true)
+    {
+        switch (Stase)
         {
-        case 1:
-            ClearScreen();
-            LietKeItem(it, so_luong_item_hientai);
-            break;
-        case 2:
-            ClearScreen();
-            themItem(it);
-            break;
-        case 3:
-            ClearScreen();
-            suaItem(it);
-            break;
-        case 4:
-            ClearScreen();
-            xoaItem(it);
-            break;
-        case 5:
-            ClearScreen();
-            TimKiemItem(it);
-            break;
-        case 6:
-            ClearScreen();
-            SapXepItem(it);
-            break;
-        case 7:
-            ClearScreen();
-            NhapKhongGian(canNang);
-            GeneticFunction();
-            break;
-        default:
-            flag = false;
+        case MENU:
+        {
+            Menu(it);
             break;
         }
+        case OUTPUT:
+        {
+            Output(it, so_luong_item_hientai);
+            break;
+        }
+        case ADD:
+        {
+            Add(it);
+            break;
+        }
+        case EDIT:
+        {
+            Edit(it);
+            break;
+        }
+        case DEL:
+        {
+            Del(it);
+            break;
+        }
+        case SEARCH:
+        {
+            Search(it);
+            break;
+        }
+        case SORT:
+        {
+            Sort(it);
+            break;
+        }
+        case SUGGEST:
+        {
+            Suggest(it);
+            break;
+        }
+        case EXIT:
+        {
+            ClearScreen();
+            SetColor(15);
+            LuuThongTinMoi(it);
+            delete[] it;
+            it = nullptr;
+            return 0;
+            break;
+        }
+        }
     }
-
-    LuuThongTinMoi(it);
-    delete[] it;
-    it = nullptr;
-    return 0;
 }
 
+//===============================// KẾT THÚC CHƯƠNG TRÌNH //==============================================
